@@ -55,6 +55,19 @@ async function startServer() {
     });
   });
 
+  // 1b. Administration Seed Reset Endpoint
+  app.post('/api/admin/reset-seed', (req, res) => {
+    try {
+      store.reset();
+      res.json({ 
+        success: true, 
+        message: 'The sovereign database store has been completely restored. All mock accounts, audit logs, ledger transactions, and KYC files initialized.'
+      });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || 'Failure during sandbox database seed reset.' });
+    }
+  });
+
   // Register customer
   app.post('/api/auth/register', (req, res) => {
     const { name, email, password } = req.body;

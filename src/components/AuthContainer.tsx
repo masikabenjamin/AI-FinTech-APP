@@ -57,8 +57,11 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
   // Validation errors
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
+  const [seedSearch, setSeedSearch] = useState('');
+  const [seedTab, setSeedTab] = useState<'admin' | 'customer'>('admin');
+
   // Seed user profiles definition for UAT evaluator ease-of-use
-  const seedAccounts = [
+  const adminSeedAccounts = [
     { title: 'Super Admin Access', email: 'admin.super@apex.com', pass: 'SuperAdmin123!', role: 'Super Admin', desc: 'Full core access. Can wipe permanent logs, approve KYC, compliance resolve.' },
     { title: 'Compliance Analyst', email: 'compliance.analyst@apex.com', pass: 'Compliance123!', role: 'Compliance Analyst', desc: 'Resolve alerts, review KYC profiles. Cannot wipe logs or settings.' },
     { title: 'Operations Officer', email: 'ops.officer@apex.com', pass: 'Operations123!', role: 'Operations Officer', desc: 'Can approve KYC, manage helpdesk. Restricted compliance alerts resolve.' },
@@ -66,7 +69,19 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
     { title: 'Support Agent Desk', email: 'support.agent@apex.com', pass: 'Support123!', role: 'Support Agent', desc: 'Access support desk replies ONLY. Blocked settings, logs, ledger.' },
     { title: 'Sovereign Risk Manager', email: 'risk.manager@apex.com', pass: 'Risk123!', role: 'Risk Manager', desc: 'Watchdog clearances. Overrides alert holds, checks ledgers.' },
     { title: 'Executive Viewer', email: 'exec.viewer@apex.com', pass: 'Executive123!', role: 'Executive Viewer', desc: 'Read-only access across all backoffice features.' },
-    { title: 'Sarah Jenkins (Client)', email: 'sarah.j@enterprise.com', pass: 'Sarah123!', role: 'Customer', desc: 'Primary retail client. Full dashboard transfers, budgets, savings.' },
+  ];
+
+  const customerSeedAccounts = [
+    { title: 'Sarah Jenkins', email: 'sarah.j@enterprise.com', pass: 'Sarah123!', role: 'Customer', desc: 'Primary retail client (LOW risk, KYC Approved). Balance: $45.2k.' },
+    { title: 'Michael Chen', email: 'chen.m@techcorp.io', pass: 'Michael123!', role: 'Customer', desc: 'Rich tech entrepreneur (LOW risk, KYC Approved). Balance: $124.5k.' },
+    { title: 'Amara Okafor', email: 'amara@designstudio.co', pass: 'Amara123!', role: 'Customer', desc: 'Creative designer (MEDIUM risk, KYC Pending). Balance: $8.9k.' },
+    { title: 'Carlos Ruiz', email: 'carlos.r@globalops.net', pass: 'Carlos123!', role: 'Customer', desc: 'Global operations (LOW risk, Frozen Debit Card). Balance: $3.1k.' },
+    { title: 'Elena Rostova', email: 'elena.r@finadvise.eu', pass: 'Elena123!', role: 'Customer', desc: 'Wealthy financial consultant (HIGH risk). Balance: $620k.' },
+    { title: 'David Brown', email: 'dbrown@freelance.org', pass: 'David123!', role: 'Customer', desc: 'Freelance analyst (HIGH risk, KYC Rejected, Blocked card). Balance: $1.4k.' },
+    { title: 'Yuki Tanaka', email: 'yuki.t@sunrise.jp', pass: 'Yuki123!', role: 'Customer', desc: 'Tech partner investor (LOW risk, KYC Pending). Balance: $93.4k.' },
+    { title: 'Zayn Malik', email: 'zayn@malikmusic.com', pass: 'Zayn123!', role: 'Customer', desc: 'Creative musician user (MEDIUM risk). Balance: $12.5k.' },
+    { title: 'Oliver Hansen', email: 'oliver@hansenholdings.dk', pass: 'Oliver123!', role: 'Customer', desc: 'Investment holder (MEDIUM risk, KYC Escalated). Balance: $850.' },
+    { title: 'Sofia Al-Mansoor', email: 'sofia@mansoor-equity.ae', pass: 'Sofia123!', role: 'Customer', desc: 'Ultra high-net-worth client (LOW risk). Balance: $3.1m.' },
   ];
 
   const handleAutofill = (selectedEmail: string, selectedPass: string, isCustomer: boolean) => {
@@ -81,6 +96,34 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
       setActiveTab('admin-login');
     }
     setPendingMfaSessionId(null);
+  };
+
+  const handleInstantLogin = async (selectedEmail: string, selectedPass: string, isCustomer: boolean) => {
+    setErrorMsg(null);
+    setSuccessMsg(null);
+    setValidationErrors({});
+    setIsLoading(true);
+    try {
+      const authData = await loginUser(selectedEmail, selectedPass);
+      let finalSessionId = authData.sessionId;
+
+      if (authData.mfaRequired) {
+        // Administrative bypass sequence automatic MFA pass helper
+        const mfaRes = await verifyMFA(authData.sessionId, '123456');
+        finalSessionId = mfaRes.sessionId;
+        localStorage.setItem('apex_session_token', finalSessionId);
+        localStorage.setItem('apex_session_user', JSON.stringify(mfaRes.user));
+        onAuthSuccess(finalSessionId, mfaRes.user);
+      } else {
+        localStorage.setItem('apex_session_token', authData.sessionId);
+        localStorage.setItem('apex_session_user', JSON.stringify(authData.user));
+        onAuthSuccess(authData.sessionId, authData.user);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Instant login failed.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const validateEmail = (e: string) => {
@@ -345,13 +388,45 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
               <p className="text-slate-400 text-xs">Login below to review balance statements and double-entry journals.</p>
             </div>
 
+            {/* In-form Quick-Autofill Selector for Mobile and High-Efficiency Testing */}
+            <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-950 bg-opacity-80 border-slate-850' : 'bg-slate-50 border-slate-200'} mb-4`}>
+              <div className="text-[10px] uppercase font-mono font-bold tracking-wider text-indigo-400 mb-2 flex items-center gap-1.5">
+                <BookOpen className="h-3.5 w-3.5 text-indigo-400" /> Click to Autofill Client Credentials:
+              </div>
+              <div className="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto pr-1">
+                {customerSeedAccounts.map((ac) => (
+                  <button
+                    key={ac.email}
+                    type="button"
+                    onClick={() => {
+                      setEmail(ac.email);
+                      setPassword(ac.pass);
+                      setErrorMsg(null);
+                      setValidationErrors({});
+                    }}
+                    className={`px-2.5 py-1 text-[10px] font-mono font-extrabold rounded-xl border transition-all cursor-pointer ${
+                      email.toLowerCase().trim() === ac.email.toLowerCase().trim()
+                        ? 'bg-indigo-600 text-white border-indigo-505 shadow-sm'
+                        : darkMode
+                          ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-850 hover:text-white'
+                          : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 font-sans'
+                    }`}
+                  >
+                    👤 {ac.title.split(' ')[0]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-4">
               <div>
                 <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-400 block mb-1">Secure Email Address</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
-                    type="text"
+                    type="email"
+                    name="username"
+                    autoComplete="username email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -369,6 +444,8 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
                   <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -546,13 +623,48 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
               <p className="text-slate-400 text-xs">Verify credentials and input your secure regulatory clearances.</p>
             </div>
 
+            {/* In-form Quick-Autofill Selector for Administrative Testing */}
+            <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-950 bg-opacity-80 border-slate-850' : 'bg-slate-50 border-slate-200'} mb-4`}>
+              <div className="text-[10px] uppercase font-mono font-bold tracking-wider text-rose-400 mb-2 flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-rose-500" /> Click to Autofill Administrative Credentials:
+              </div>
+              <div className="flex flex-wrap gap-1.5 max-h-[100px] overflow-y-auto pr-1">
+                {adminSeedAccounts.map((ac) => {
+                  const label = ac.title.replace(' Access', '').replace(' Desk', '');
+                  return (
+                    <button
+                      key={ac.email}
+                      type="button"
+                      onClick={() => {
+                        setEmail(ac.email);
+                        setPassword(ac.pass);
+                        setErrorMsg(null);
+                        setValidationErrors({});
+                      }}
+                      className={`px-2.5 py-1 text-[10px] font-mono font-extrabold rounded-xl border transition-all cursor-pointer ${
+                        email.toLowerCase().trim() === ac.email.toLowerCase().trim()
+                          ? 'bg-indigo-600 text-white border-indigo-505 shadow-sm'
+                          : darkMode
+                            ? 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-850 hover:text-white'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100 font-sans'
+                      }`}
+                    >
+                      🛡️ {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="space-y-4 font-sans">
               <div>
                 <label className="text-[10px] uppercase font-mono font-bold tracking-wider text-slate-400 block mb-1">Auditor Identification Email</label>
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
-                    type="text"
+                    type="email"
+                    name="admin-username"
+                    autoComplete="username email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -570,6 +682,8 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
                   <Lock className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="admin-password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -801,64 +915,121 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
         <div className={`p-5 rounded-3xl border ${
           darkMode ? 'bg-slate-950/60 border-slate-800' : 'bg-slate-900 text-white border-slate-800'
         }`}>
-          <div className="flex items-center gap-2.5 mb-2 pb-2.5 border-b border-slate-800">
+          <div className="flex items-center gap-2.5 mb-3 pb-2.5 border-b border-slate-800">
             <BookOpen className="h-5 w-5 text-indigo-400 animate-pulse" />
             <div>
               <h4 className="font-extrabold tracking-tight font-sans text-xs uppercase text-indigo-400">APP Seed accounts</h4>
-              <p className="text-[10px] text-slate-400 font-mono">Development test credentials matrix</p>
+              <p className="text-[10px] text-slate-400 font-mono">Sandbox identity management directory</p>
             </div>
           </div>
 
-          <p className="text-[11px] leading-relaxed text-slate-450 mb-4 font-mono">
-            Click <strong className="text-indigo-400">Autofill shortcut</strong> next to any role to instant fill input parameters for evaluation.
+          <p className="text-[11px] leading-relaxed text-slate-400 mb-3 font-mono">
+            Access credentials automatically. Click <strong className="text-indigo-400 font-bold">Load & Fill</strong> to switch forms, or <strong className="text-emerald-400 font-bold">⚡ Direct Login</strong> to bypass credentials and sign in instantly.
           </p>
 
-          <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
-            {seedAccounts.map((ac, idx) => {
-              const isCust = ac.role === 'Customer';
-              return (
-                <div 
-                  key={idx} 
-                  className={`p-3 rounded-2xl border text-[11px] flex flex-col justify-between gap-1.5 transition-all hover:bg-slate-900/80 ${
-                    darkMode ? 'bg-slate-900 border-slate-850' : 'bg-slate-950 border-slate-850'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-white font-sans text-xs tracking-tight block">
-                      {isCust ? '👤' : '🛡️'} {ac.title}
-                    </span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase ${
-                      isCust ? 'bg-indigo-950 text-indigo-300' : 'bg-indigo-500/10 text-indigo-400'
-                    }`}>
-                      {ac.role}
-                    </span>
-                  </div>
+          {/* Seed Tab Toggle switcher */}
+          <div className="grid grid-cols-2 gap-1.5 p-1 bg-slate-950 rounded-xl mb-3 border border-slate-850">
+            <button
+              type="button"
+              onClick={() => { setSeedTab('admin'); setSeedSearch(''); }}
+              className={`py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider font-mono transition-all flex items-center justify-center gap-1.5 ${
+                seedTab === 'admin'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              }`}
+            >
+              🛡️ Backoffice ({adminSeedAccounts.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => { setSeedTab('customer'); setSeedSearch(''); }}
+              className={`py-1.5 rounded-lg text-[10px] uppercase font-bold tracking-wider font-mono transition-all flex items-center justify-center gap-1.5 ${
+                seedTab === 'customer'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
+              }`}
+            >
+              👤 Customers ({customerSeedAccounts.length})
+            </button>
+          </div>
 
-                  <div className="font-mono text-[10px] space-y-0.5 text-slate-450 leading-tight">
-                    <div className="flex justify-between">
-                      <span>Email:</span>
-                      <span className="text-slate-300 font-bold select-all">{ac.email}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Pass:</span>
-                      <span className="text-indigo-405 font-bold select-all">{ac.pass}</span>
-                    </div>
-                  </div>
+          {/* Seed Account Search bar */}
+          <div className="relative mb-3.5">
+            <input
+              type="text"
+              placeholder={`Search ${seedTab === 'admin' ? 'backoffice roles' : 'seeded client profiles'}...`}
+              value={seedSearch}
+              onChange={(e) => setSeedSearch(e.target.value)}
+              className="w-full px-3 py-2 text-[10.5px] font-mono bg-slate-950 border border-slate-850 rounded-xl leading-none text-white focus:outline-hidden focus:border-indigo-550"
+            />
+          </div>
 
-                  <p className="text-[10px] text-slate-500 leading-normal italic line-clamp-2">
-                    {ac.desc}
-                  </p>
-
-                  <button
-                    onClick={() => handleAutofill(ac.email, ac.pass, isCust)}
-                    style={{ cursor: 'pointer' }}
-                    className="mt-1 w-full py-1.5 bg-indigo-600/10 border border-indigo-600/35 hover:bg-indigo-600 text-indigo-300 hover:text-white font-bold rounded-xl transition-all text-center uppercase tracking-tight text-[10px] flex items-center justify-center gap-1"
+          <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
+            {(seedTab === 'admin' ? adminSeedAccounts : customerSeedAccounts)
+              .filter(ac => {
+                const term = seedSearch.toLowerCase().trim();
+                if (!term) return true;
+                return (
+                  ac.title.toLowerCase().includes(term) ||
+                  ac.email.toLowerCase().includes(term) ||
+                  ac.desc.toLowerCase().includes(term) ||
+                  ac.role.toLowerCase().includes(term)
+                );
+              })
+              .map((ac, idx) => {
+                const isCust = seedTab === 'customer';
+                return (
+                  <div 
+                    key={idx} 
+                    className={`p-3 rounded-2xl border text-[11px] flex flex-col justify-between gap-1.5 transition-all hover:bg-slate-900/80 ${
+                      darkMode ? 'bg-slate-900 border-slate-850' : 'bg-slate-950 border-slate-850'
+                    }`}
                   >
-                    Load & Fill <ChevronRight className="h-3 w-3" />
-                  </button>
-                </div>
-              );
-            })}
+                    <div className="flex items-center justify-between">
+                      <span className="font-extrabold text-white font-sans text-xs tracking-tight block">
+                        {isCust ? '👤' : '🛡️'} {ac.title}
+                      </span>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded-md font-bold uppercase ${
+                        isCust ? 'bg-indigo-950 text-indigo-300 border border-indigo-900/30' : 'bg-indigo-500/10 text-indigo-400'
+                      }`}>
+                        {ac.role}
+                      </span>
+                    </div>
+
+                    <div className="font-mono text-[10px] space-y-0.5 text-slate-400 leading-tight">
+                      <div className="flex justify-between">
+                        <span>Email:</span>
+                        <span className="text-slate-300 font-bold select-all">{ac.email}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Pass:</span>
+                        <span className="text-indigo-400 font-bold select-all">{ac.pass}</span>
+                      </div>
+                    </div>
+
+                    <p className="text-[10px] text-slate-500 leading-normal italic line-clamp-2">
+                      {ac.desc}
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-1.5 mt-1">
+                      <button
+                        type="button"
+                        onClick={() => handleAutofill(ac.email, ac.pass, isCust)}
+                        className="py-1.5 bg-indigo-600/10 border border-indigo-600/30 hover:bg-indigo-605 text-indigo-300 hover:text-white font-extrabold rounded-xl transition-all text-center uppercase tracking-tight text-[9.5px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        Load & Fill <ChevronRight className="h-3 w-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleInstantLogin(ac.email, ac.pass, isCust)}
+                        className="py-1.5 bg-emerald-600/10 border border-emerald-600/30 hover:bg-emerald-600 text-emerald-300 hover:text-white font-extrabold rounded-xl transition-all text-center uppercase tracking-tight text-[9.5px] flex items-center justify-center gap-1 cursor-pointer"
+                      >
+                        ⚡ Direct Login
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
           </div>
 
         </div>

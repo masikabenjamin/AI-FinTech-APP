@@ -21,6 +21,18 @@ export async function fetchHealth(): Promise<{ status: string; service: string }
   return res.json();
 }
 
+export async function resetSeedData(): Promise<{ success: boolean; message: string }> {
+  const res = await fetch(`${API_BASE}/admin/reset-seed`, {
+    method: 'POST',
+    headers: getHeaders()
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to restore seed sandbox database.');
+  }
+  return res.json();
+}
+
 export async function fetchUsers(): Promise<UserProfile[]> {
   const res = await fetch(`${API_BASE}/users`, {
     headers: getHeaders()

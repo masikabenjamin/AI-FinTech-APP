@@ -11,6 +11,7 @@ import { OperationsCockpit } from './OperationsCockpit';
 import { UserManagementPanel } from './UserManagementPanel';
 import { FinanceConsole } from './FinanceConsole';
 import { AICockpit } from './AICockpit';
+import { UatDashboard } from './UatDashboard';
 import { 
   ShieldCheck, 
   ShieldAlert, 
@@ -33,7 +34,8 @@ import {
   ToggleRight,
   RefreshCw,
   TrendingUp,
-  Brain
+  Brain,
+  CheckCircle
 } from 'lucide-react';
 import { StatusBadge, RiskBadge, StatCard } from '../../components/DesignSystem';
 
@@ -168,7 +170,7 @@ export const AdminApp: React.FC<AdminAppProps> = ({
   activeUser,
   onLogout
 }) => {
-  const [activeTab, setActiveTab] = useState<'cockpit' | 'users' | 'kyc' | 'compliance' | 'ledger' | 'audit' | 'support' | 'settings' | 'finance'>('cockpit');
+  const [activeTab, setActiveTab ] = useState<'cockpit' | 'users' | 'kyc' | 'compliance' | 'ledger' | 'audit' | 'support' | 'settings' | 'finance' | 'ai-insights' | 'uat'>('cockpit');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
@@ -220,9 +222,12 @@ export const AdminApp: React.FC<AdminAppProps> = ({
       case 'kyc': return 'KYC Onboarding queue';
       case 'compliance': return 'Risk Monitoring Holds';
       case 'ledger': return 'Double Entry Balance Sheet';
+      case 'finance': return 'Finance & Settlements Core';
+      case 'ai-insights': return 'AI Smart Insights Cockpit';
       case 'audit': return 'Operational Security Audits';
       case 'support': return 'Helpdesk Disputes Review';
       case 'settings': return 'System Settings & RBAC Policies';
+      case 'uat': return 'QA Testing & UAT Control Center';
       default: return 'System Controls';
     }
   };
@@ -481,6 +486,25 @@ export const AdminApp: React.FC<AdminAppProps> = ({
                 >
                   <Sliders className="h-4 w-4" />
                   Settings & RBAC Matrix
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('uat')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold cursor-pointer transition-all text-left border ${
+                    activeTab === 'uat'
+                      ? 'bg-gradient-to-r from-amber-600 to-indigo-600 text-white border-transparent'
+                      : 'border-dashed border-amber-500/30 text-amber-500 hover:bg-amber-500/10'
+                  }`}
+                  id="admin-uat-sidebar-btn"
+                >
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 animate-pulse" />
+                    UAT Quality Gate
+                  </span>
+                  <span className="font-mono text-[8px] bg-amber-500/20 text-yellow-300 px-1.5 py-0.5 rounded font-black uppercase">
+                    QA-CTL
+                  </span>
                 </button>
 
               </nav>
@@ -879,6 +903,20 @@ export const AdminApp: React.FC<AdminAppProps> = ({
                   </div>
                 </div>
               ) : renderAccessDenied('System configuration & policy bounds settings', 'manageSettings')
+            )}
+
+            {activeTab === 'uat' && (
+              <UatDashboard
+                users={users}
+                transactions={transactions}
+                kycCases={kycCases}
+                tickets={tickets}
+                auditLogs={auditLogs}
+                onRefreshAll={onRefreshAll}
+                darkMode={darkMode}
+                activeUser={activeUser}
+                onLogout={onLogout}
+              />
             )}
 
           </main>
