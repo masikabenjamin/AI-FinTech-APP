@@ -13,6 +13,7 @@ import ledgerCore from './server/ledger/ledgerCore';
 import riskEngine from './server/risk/riskEngine';
 import auditLogger from './server/audit/auditLogger';
 import financeCore from './server/finance/financeCore';
+import aiCore from './server/ai/aiCore';
 import { askFinanceAssistant } from './server/gemini';
 import { Transaction, UserProfile, KYCCase, SavingsGoal } from './src/types';
 
@@ -1751,6 +1752,143 @@ async function startServer() {
     }
 
     res.json(adj);
+  });
+
+  // -------------------------------------------------------------
+  // CENTRAL AI INSIGHTS & AI CONTROL CENTER ENDPOINTS
+  // -------------------------------------------------------------
+  app.get('/api/ai/insights', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const permittedRoles = ['Super Admin', 'Risk Manager', 'Compliance Analyst', 'Finance Officer', 'Finance Manager', 'Support Agent', 'Operations Officer', 'Executive Viewer'];
+    if (!permittedRoles.includes(sess.role)) {
+      return res.status(403).json({ error: 'Access Denied: Lacking clearance to view AI insights.' });
+    }
+
+    res.json({
+      revenueSeries: aiCore.getRevenueSeries(),
+      volumeSeries: aiCore.getVolumeSeries(),
+      userGrowthSeries: aiCore.getUserGrowthSeries(),
+      fraudAlertSeries: aiCore.getFraudAlertSeries(),
+      recommendedActions: aiCore.getRecommendedActions()
+    });
+  });
+
+  app.get('/api/ai/models', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const permittedRoles = ['Super Admin', 'Risk Manager', 'Compliance Analyst', 'Finance Officer', 'Finance Manager', 'Support Agent', 'Operations Officer', 'Executive Viewer'];
+    if (!permittedRoles.includes(sess.role)) return res.status(403).json({ error: 'Access Denied.' });
+
+    res.json(aiCore.models);
+  });
+
+  app.get('/api/ai/predictions', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const permittedRoles = ['Super Admin', 'Risk Manager', 'Compliance Analyst', 'Finance Officer', 'Finance Manager', 'Support Agent', 'Operations Officer', 'Executive Viewer'];
+    if (!permittedRoles.includes(sess.role)) return res.status(403).json({ error: 'Access Denied.' });
+
+    res.json(aiCore.predictionLogs);
+  });
+
+  app.get('/api/ai/thresholds', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const permittedRoles = ['Super Admin', 'Risk Manager', 'Compliance Analyst', 'Finance Officer', 'Finance Manager', 'Support Agent', 'Operations Officer', 'Executive Viewer'];
+    if (!permittedRoles.includes(sess.role)) return res.status(403).json({ error: 'Access Denied.' });
+
+    res.json({
+      thresholds: aiCore.thresholds,
+      changeRequests: aiCore.changeRequests
+    });
+  });
+
+  app.post('/api/ai/thresholds/propose', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const isAuthorized = ['Super Admin', 'Risk Manager', 'Compliance Analyst'].includes(sess.role);
+    const operatorName = store.getUserById(sess.userId)?.name || 'Risk Specialist';
+
+    if (!isAuthorized) {
+      store.logAudit(
+        operatorName,
+        'AI_THRESHOLD_PROPOSE_DENIED',
+        `Access Log Blocked: User with role ${sess.role} attempted to propose system threshold revisions. Privilege level unauthorized.`,
+        'FAILURE',
+        req.ip || '127.0.0.1'
+      );
+      return res.status(403).json({ error: 'Access Denied: Only authorized risk/admin roles (Super Admin, Risk Manager, Compliance Analyst) hold clearance parameters to propose threshold updates.' });
+    }
+
+    const { settingName, newValue, notes } = req.body;
+    if (!settingName || typeof newValue !== 'number' || !notes || notes.trim() === '') {
+      return res.status(400).json({ error: 'Please supply a setting name (fraudScoreThreshold or casePriorityThreshold), a numerical new value, and an explanatory justification.' });
+    }
+
+    try {
+      const result = aiCore.proposeThresholdChange(settingName as any, newValue, `${operatorName} (${sess.role})`, notes);
+
+      store.logAudit(
+        operatorName,
+        'AI_THRESHOLD_CHANGE_PROPOSED',
+        `Proposed ${settingName} threshold change to ${newValue}. Reason: ${notes}`,
+        'WARNING',
+        req.ip || '127.0.0.1'
+      );
+
+      res.json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
+  });
+
+  app.post('/api/ai/thresholds/:id/approve', (req, res) => {
+    const sess = getSessionFromReq(req);
+    if (!sess) return res.status(401).json({ error: 'Unauthorized.' });
+
+    const isAuthorized = ['Super Admin', 'Risk Manager', 'Compliance Analyst'].includes(sess.role);
+    const operatorName = store.getUserById(sess.userId)?.name || 'Risk Approver';
+
+    if (!isAuthorized) {
+      store.logAudit(
+        operatorName,
+        'AI_THRESHOLD_APPROVE_DENIED',
+        `Access Log Blocked: User with role ${sess.role} attempted to authorize AI classification threshold updates without proper authorization level.`,
+        'FAILURE',
+        req.ip || '127.0.0.1'
+      );
+      return res.status(403).json({ error: 'Access Denied: Only Super Admin, Risk Manager, and Compliance Analyst roles hold central authorization credentials to approve/reject AI thresholds.' });
+    }
+
+    const { action, feedback } = req.body;
+    if (!action || !['APPROVED', 'REJECTED'].includes(action)) {
+      return res.status(400).json({ error: 'Please specify confirmation action: APPROVED or REJECTED.' });
+    }
+
+    try {
+      const result = aiCore.approveThresholdChange(req.params.id, `${operatorName} (${sess.role})`, action as any, feedback || 'No additional comments provided.');
+      if (!result) {
+        return res.status(404).json({ error: 'AI threshold request not found.' });
+      }
+
+      store.logAudit(
+        operatorName,
+        `AI_THRESHOLD_${action}`,
+        `Decision resolved for threshold request ${req.params.id}. Action: ${action}. auditor notes: ${feedback || 'None'}`,
+        action === 'APPROVED' ? 'SUCCESS' : 'WARNING',
+        req.ip || '127.0.0.1'
+      );
+
+      res.json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message });
+    }
   });
 
   // 10. Audit ledger history logs

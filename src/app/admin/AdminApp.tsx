@@ -5,10 +5,12 @@ import { KYCReviewPanel } from './KYCReviewPanel';
 import { ComplianceManager } from './ComplianceManager';
 import { LedgerProofConsole } from './LedgerProofConsole';
 import { SecuredAuditTrail } from './SecuredAuditTrail';
+import { SecurityCockpit } from './SecurityCockpit';
 import { AdminSupportDesk } from './AdminSupportDesk';
 import { OperationsCockpit } from './OperationsCockpit';
 import { UserManagementPanel } from './UserManagementPanel';
 import { FinanceConsole } from './FinanceConsole';
+import { AICockpit } from './AICockpit';
 import { 
   ShieldCheck, 
   ShieldAlert, 
@@ -30,7 +32,8 @@ import {
   ToggleLeft,
   ToggleRight,
   RefreshCw,
-  TrendingUp
+  TrendingUp,
+  Brain
 } from 'lucide-react';
 import { StatusBadge, RiskBadge, StatCard } from '../../components/DesignSystem';
 
@@ -416,6 +419,23 @@ export const AdminApp: React.FC<AdminAppProps> = ({
                 </button>
 
                 <button
+                  onClick={() => setActiveTab('ai-insights')}
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold cursor-pointer transition-all text-left ${
+                    activeTab === 'ai-insights'
+                      ? 'bg-indigo-600 text-white shadow-sm'
+                      : darkMode ? 'text-slate-400 hover:bg-slate-850' : 'text-slate-600 hover:bg-slate-100'
+                  }`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Brain className="h-4 w-4" />
+                    AI Insights & Control
+                  </span>
+                  <span className="font-mono text-[8px] bg-purple-500/10 text-purple-400 px-1.5 py-0.5 rounded font-extrabold tracking-tight">
+                    ESTIMATE
+                  </span>
+                </button>
+
+                <button
                   onClick={() => setActiveTab('audit')}
                   className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl font-bold cursor-pointer transition-all text-left ${
                     activeTab === 'audit'
@@ -696,22 +716,23 @@ export const AdminApp: React.FC<AdminAppProps> = ({
               />
             )}
 
+            {activeTab === 'ai-insights' && (
+              <AICockpit
+                darkMode={darkMode}
+                activeUser={{ name: activeUser.name, role: activeUser.role, email: activeUser.email }}
+              />
+            )}
+
             {activeTab === 'audit' && (
               permissions.viewAudit ? (
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
-                    <div>
-                      <h4 className={`text-md font-bold font-sans ${darkMode ? 'text-white' : 'text-slate-900'}`}>Immutable Security Audit Trails</h4>
-                      <span className="text-[11px] text-slate-400 block mt-0.5">Review diagnostic server telemetry actions matching legal standards.</span>
-                    </div>
-                  </div>
-                  <SecuredAuditTrail
-                    logs={auditLogs}
-                    onRefresh={onRefreshAll}
-                    darkMode={darkMode}
-                    canWipe={permissions.wipeAudit}
-                  />
-                </div>
+                <SecurityCockpit
+                  logs={auditLogs}
+                  users={users}
+                  onRefresh={onRefreshAll}
+                  darkMode={darkMode}
+                  activeUser={activeUser}
+                  onLogout={onLogout}
+                />
               ) : renderAccessDenied('Immutable Operational Telemetry Audits', 'viewAudit')
             )}
 

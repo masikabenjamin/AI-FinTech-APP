@@ -652,4 +652,119 @@ export async function approveAdjustment(id: string, action: 'APPROVE' | 'REJECT'
   return data;
 }
 
+// -------------------------------------------------------------
+// CENTRAL AI INSIGHTS & AI CONTROL CENTER API MODULE
+// -------------------------------------------------------------
+
+export interface AICoreModel {
+  id: string;
+  name: string;
+  status: 'ACTIVE' | 'TRAINING' | 'OFFLINE' | 'DEGRADED';
+  version: string;
+  predictionCount: number;
+  lastTrainingDate: string;
+  accuracy: number;
+  precision: number;
+  recall: number;
+  driftIndicator: 'NONE' | 'LOW' | 'HIGH';
+  latencyMs: number;
+}
+
+export interface AIThresholdSettings {
+  id: string;
+  fraudScoreThreshold: number;
+  casePriorityThreshold: number;
+}
+
+export interface AIThresholdChangeRequest {
+  id: string;
+  settingName: 'fraudScoreThreshold' | 'casePriorityThreshold';
+  oldValue: number;
+  newValue: number;
+  proposedBy: string;
+  proposedAt: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  approvedBy?: string;
+  approvedAt?: string;
+  notes: string;
+  auditorFeedback?: string;
+}
+
+export interface AIPredictionRecord {
+  id: string;
+  timestamp: string;
+  modelId: string;
+  modelName: string;
+  inputReference: string;
+  modelOutput: string;
+  confidence: number;
+  actionTaken: string;
+}
+
+export interface AIInsightsPayload {
+  revenueSeries: Array<{ month: string; actual?: number; forecast?: number; type: 'HISTORICAL' | 'FORECAST' }>;
+  volumeSeries: Array<{ month: string; actual?: number; forecast?: number; type: 'HISTORICAL' | 'FORECAST' }>;
+  userGrowthSeries: Array<{ month: string; activeUsers: number; churnRisk: number; type: 'HISTORICAL' | 'FORECAST' }>;
+  fraudAlertSeries: Array<{ month: string; alertsCount: number; falsePositives: number; type: 'HISTORICAL' | 'FORECAST' }>;
+  recommendedActions: Array<{ id: string; title: string; priority: string; category: string; benefit: string; details: string }>;
+}
+
+export async function fetchAIInsights(): Promise<AIInsightsPayload> {
+  const res = await fetch(`${API_BASE}/ai/insights`, {
+    headers: getHeaders()
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch AI Insights dashboard statistics.');
+  return data;
+}
+
+export async function fetchAIModels(): Promise<AICoreModel[]> {
+  const res = await fetch(`${API_BASE}/ai/models`, {
+    headers: getHeaders()
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch AI Models Registry.');
+  return data;
+}
+
+export async function fetchAIThresholds(): Promise<{ thresholds: AIThresholdSettings; changeRequests: AIThresholdChangeRequest[] }> {
+  const res = await fetch(`${API_BASE}/ai/thresholds`, {
+    headers: getHeaders()
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to fetch AI Threshold configuration.');
+  return data;
+}
+
+export async function fetchAIPredictionLogs(): Promise<AIPredictionRecord[]> {
+  const res = await fetch(`${API_BASE}/ai/predictions`, {
+    headers: getHeaders()
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to load Prediction system audit files.');
+  return data;
+}
+
+export async function proposeAIThresholdChange(payload: { settingName: string; newValue: number; notes: string }): Promise<AIThresholdChangeRequest> {
+  const res = await fetch(`${API_BASE}/ai/thresholds/propose`, {
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Failed to propose threshold update.');
+  return data;
+}
+
+export async function approveAIThresholdChange(id: string, action: 'APPROVED' | 'REJECTED', feedback?: string): Promise<AIThresholdChangeRequest> {
+  const res = await fetch(`${API_BASE}/ai/thresholds/${id}/approve`, {
+    method: 'POST',
+    headers: getHeaders({ 'Content-Type': 'application/json' }),
+    body: JSON.stringify({ action, feedback })
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Processing threshold approval request was blocked.');
+  return data;
+}
+
 
