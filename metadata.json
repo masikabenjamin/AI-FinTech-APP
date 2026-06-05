@@ -1,0 +1,6 @@
+{
+  "name": "AI FinTech APP",
+  "description": "An enterprise-grade AI-powered FinTech platform featuring multi-role dashboards, compliance and risk monitoring, audit logs, ledger balance rules, and a Gemini-powered finance assistant.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
