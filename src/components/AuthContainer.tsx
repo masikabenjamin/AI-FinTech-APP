@@ -161,19 +161,19 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
     const passwordInput = document.getElementById('register-password-field') as HTMLInputElement;
     const confirmInput = document.getElementById('register-confirm-password-field') as HTMLInputElement;
 
-    if (!nameVal && nameInput?.value) {
+    if (nameInput && nameInput.value !== nameVal) {
       nameVal = nameInput.value;
       setName(nameInput.value);
     }
-    if (!emailVal && emailInput?.value) {
+    if (emailInput && emailInput.value !== emailVal) {
       emailVal = emailInput.value;
       setEmail(emailInput.value);
     }
-    if (!passwordVal && passwordInput?.value) {
+    if (passwordInput && passwordInput.value !== passwordVal) {
       passwordVal = passwordInput.value;
       setPassword(passwordInput.value);
     }
-    if (!confirmVal && confirmInput?.value) {
+    if (confirmInput && confirmInput.value !== confirmVal) {
       confirmVal = confirmInput.value;
       setConfirmPassword(confirmInput.value);
     }
@@ -237,11 +237,11 @@ export const AuthContainer: React.FC<AuthContainerProps> = ({
     const emailInput = document.getElementById(emailId) as HTMLInputElement;
     const passwordInput = document.getElementById(passwordId) as HTMLInputElement;
 
-    if (!emailVal && emailInput?.value) {
+    if (emailInput && emailInput.value !== emailVal) {
       emailVal = emailInput.value;
       setEmail(emailInput.value);
     }
-    if (!passwordVal && passwordInput?.value) {
+    if (passwordInput && passwordInput.value !== passwordVal) {
       passwordVal = passwordInput.value;
       setPassword(passwordInput.value);
     }
