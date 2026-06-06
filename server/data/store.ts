@@ -1024,27 +1024,6 @@ export class FintechStore {
     return this.users.find(u => u.id === id);
   }
 
-  public reset() {
-    this.users = [];
-    this.transactions = [];
-    this.kycCases = [];
-    this.complianceAlerts = [];
-    this.supportTickets = [];
-    this.auditLogs = [];
-    this.budgets = [];
-    this.savingsGoals = [];
-    this.reminderSettings = [];
-    this.cards = [];
-    this.rewardPoints = [];
-    this.rewardOffers = [];
-    this.rewardTransactions = [];
-    this.credentials.clear();
-    this.sessions.clear();
-    this.allowFinanceOfficerKycApproval = false;
-    this.seed();
-    this.logAudit('Super Admin', 'SEED_RESET_SUCCESS', 'Seeded sandbox database restore completed successfully. All logs, KYC queues, ledger records, and customer accounts refreshed.', 'SUCCESS', '127.0.0.1');
-  }
-
   public getTransactionById(id: string): Transaction | undefined {
     return this.transactions.find(t => t.id === id);
   }
