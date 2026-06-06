@@ -87,7 +87,7 @@ async function startServer() {
       email: emailKey,
       role: 'customer',
       balance: 1000.00, // starting balance for registration testing
-      currency: 'USD',
+      currency: 'KES',
       savingGoal: 0,
       savingCurrent: 0,
       kycStatus: 'PENDING',
@@ -283,7 +283,7 @@ async function startServer() {
     const { allowFinanceOfficerKycApproval } = req.body;
     if (allowFinanceOfficerKycApproval !== undefined) {
       store.allowFinanceOfficerKycApproval = Boolean(allowFinanceOfficerKycApproval);
-      store.logAudit('Alex Wong (Super Admin)', 'SYSTEM_SETTINGS_UPDATE', `Modified config: allowFinanceOfficerKycApproval toggled to ${store.allowFinanceOfficerKycApproval}`, 'SUCCESS', req.ip || '127.0.0.1');
+      store.logAudit('Ben Masika (Super Admin)', 'SYSTEM_SETTINGS_UPDATE', `Modified config: allowFinanceOfficerKycApproval toggled to ${store.allowFinanceOfficerKycApproval}`, 'SUCCESS', req.ip || '127.0.0.1');
     }
 
     res.json({
@@ -606,10 +606,10 @@ async function startServer() {
 
     // Backend Risk Check 1: Amount Limit check
     if (amt < 10) {
-      return res.status(400).json({ error: `LIMIT_CONTROL_REJECTED: Funding amount is below transaction minimum limit of $10.00 USD.` });
+      return res.status(400).json({ error: `LIMIT_CONTROL_REJECTED: Funding amount is below transaction minimum limit of KES 10.00.` });
     }
     if (amt > 10000) {
-      return res.status(400).json({ error: `LIMIT_CONTROL_REJECTED: Funding amount exceeds maximum single sandbox transaction limit of $10,000.00 USD.` });
+      return res.status(400).json({ error: `LIMIT_CONTROL_REJECTED: Funding amount exceeds maximum single sandbox transaction limit of KES 10,000.00.` });
     }
 
     // Backend Risk Check 2: Velocity check (no more than 3 transactions in 5 minutes map)
@@ -788,7 +788,7 @@ async function startServer() {
     store.logAudit(
       user.name,
       'FUNDING_TRANSACTION_SUCCESS',
-      `Deposited $${amt.toFixed(2)} USD via ${fundingSource} successfully. Account credited. Gateway Ref: ${gatewayReference}, Ledger Ref: ${ledgerReference}, Idempotency Key: ${idempotencyKey}`,
+      `Deposited KES ${amt.toFixed(2)} via ${fundingSource} successfully. Account credited. Gateway Ref: ${gatewayReference}, Ledger Ref: ${ledgerReference}, Idempotency Key: ${idempotencyKey}`,
       'SUCCESS',
       req.ip || '127.0.0.1'
     );

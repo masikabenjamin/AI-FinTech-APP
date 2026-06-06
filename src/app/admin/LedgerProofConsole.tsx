@@ -51,7 +51,7 @@ export const LedgerProofConsole: React.FC<LedgerProofConsoleProps> = ({
   }, [activeSubTab, ledgerStats]);
 
   const formatCurrency = (val: number) => {
-    return val.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return val.toLocaleString('en-US', { style: 'currency', currency: 'KES' });
   };
 
   // Filter central transaction records
@@ -140,7 +140,7 @@ export const LedgerProofConsole: React.FC<LedgerProofConsoleProps> = ({
               )}
             </div>
           </div>
-          <span className="text-[9px] text-slate-455 font-mono block mt-3 text-left">Discrepancy: 0 USD</span>
+          <span className="text-[9px] text-slate-455 font-mono block mt-3 text-left">Discrepancy: 0 KES</span>
         </div>
 
       </div>

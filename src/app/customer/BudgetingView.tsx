@@ -421,7 +421,7 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                   <div className={`p-3.5 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-800/70' : 'bg-white border-slate-200'}`}>
                     <span className="text-[9px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Deposited Profits</span>
                     <span className={`text-[15px] font-extrabold font-mono block mt-1 ${darkMode ? 'text-emerald-450' : 'text-emerald-750'}`}>
-                      ${thisMonthIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {user.currency || 'KES'} {thisMonthIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <span className="text-[8px] text-slate-450 font-mono block mt-0.5">Deposits on active date</span>
                   </div>
@@ -429,7 +429,7 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                   <div className={`p-3.5 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-800/70' : 'bg-white border-slate-200'}`}>
                     <span className="text-[9px] font-mono text-slate-400 font-bold uppercase tracking-wider block">Wallet Expensed Out</span>
                     <span className={`text-[15px] font-extrabold font-mono block mt-1 ${darkMode ? 'text-white' : 'text-slate-950'}`}>
-                      ${thisMonthData.sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {user.currency || 'KES'} {thisMonthData.sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <span className="text-[8px] text-slate-450 mt-0.5 font-mono block">
                       {thisMonthData.sum > prevMonthData.sum ? (
@@ -447,7 +447,7 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                         ? darkMode ? 'text-indigo-400' : 'text-indigo-750' 
                         : 'text-rose-650'
                     }`}>
-                      ${(thisMonthIncome - thisMonthData.sum).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {user.currency || 'KES'} {(thisMonthIncome - thisMonthData.sum).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <span className="text-[8px] text-slate-450 mt-0.5 font-mono block">Simulated ledger margins</span>
                   </div>
@@ -685,7 +685,7 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                       <div className="space-y-1 font-mono">
                         <div className="flex justify-between text-[10px] text-slate-450 mb-1">
                           <span>Outflow Caps</span>
-                          <span className="font-bold text-indigo-505 dark:text-indigo-400">${limit} USD</span>
+                          <span className="font-bold text-indigo-505 dark:text-indigo-400">{user.currency || 'KES'} {limit}</span>
                         </div>
                         <div className="flex items-center gap-3">
                           <input
@@ -758,7 +758,7 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-slate-400 font-bold mb-1 uppercase text-[9.5px]">Earmark target savings sum (USD)</label>
+                        <label className="block text-slate-400 font-bold mb-1 uppercase text-[9.5px]">Earmark target savings sum ({user.currency || 'KES'})</label>
                         <input
                           type="number"
                           required
@@ -871,10 +871,10 @@ export const BudgetingView: React.FC<BudgetingViewProps> = ({
                         {/* Progress display */}
                         <div className="pt-2 font-mono flex items-baseline justify-between">
                           <span className={`${darkMode ? 'text-white' : 'text-slate-905'} text-[13.5px] font-extrabold`}>
-                            ${g.currentAmount.toLocaleString()}
+                            {user.currency || 'KES'} {g.currentAmount.toLocaleString()}
                           </span>
                           <span className="text-slate-400 text-[10px]">
-                            of ${g.targetAmount.toLocaleString()} ({percent}%)
+                            of {user.currency || 'KES'} {g.targetAmount.toLocaleString()} ({percent}%)
                           </span>
                         </div>
 

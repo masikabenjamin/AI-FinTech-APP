@@ -235,7 +235,7 @@ export const RewardsView: React.FC<RewardsViewProps> = ({ user, darkMode = false
             <span className="text-xs text-indigo-300 font-bold">PTS</span>
           </div>
           <div className="text-[9.5px] text-indigo-200/80 leading-relaxed font-mono">
-            Equivalent Simulated Value: <strong>${(balance / 100).toFixed(2)} USD</strong>
+            Equivalent Simulated Value: <strong>{user.currency || 'KES'} {(balance / 100).toFixed(2)}</strong>
           </div>
         </div>
       </div>

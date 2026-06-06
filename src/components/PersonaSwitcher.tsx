@@ -101,7 +101,7 @@ export const PersonaSwitcher: React.FC<PersonaSwitcherProps> = ({
             onClick={() => {
               const adminUser = users.find(u => u.id === 'usr-super-admin' || u.role === 'Super Admin') || {
                 id: 'usr-super-admin',
-                name: 'Alex Wong (Super Admin)',
+                name: 'Ben Masika (Super Admin)',
                 email: 'admin.super@apex.com',
                 role: 'Super Admin',
                 balance: 0,
@@ -130,7 +130,7 @@ export const PersonaSwitcher: React.FC<PersonaSwitcherProps> = ({
                   : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border-slate-800'
               }`}
             >
-              👤 {cust.name.split(' ')[0]} ({cust.kycStatus === 'PENDING' ? 'KYC Temp' : `$${Math.round(cust.balance / 1000)}k`})
+              👤 {cust.name.split(' ')[0]} ({cust.kycStatus === 'PENDING' ? 'KYC Temp' : `KES ${Math.round(cust.balance / 1000)}k`})
             </button>
           ))}
 

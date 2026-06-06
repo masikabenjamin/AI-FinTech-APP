@@ -296,7 +296,7 @@ export const AICockpit: React.FC<AICockpitProps> = ({
                 <div>
                   <span className="text-[9px] tracking-wider uppercase font-mono font-bold text-slate-400 block">6-Month Income Projection</span>
                   <h3 className={`font-sans font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-800'}`}>
-                    Corporate Revenue Forecast & Trend (USD)
+                    Corporate Revenue Forecast & Trend (KES)
                   </h3>
                 </div>
                 <span className="p-1 px-1.5 rounded bg-indigo-500/10 text-indigo-400 font-mono text-[9px] font-extrabold border border-indigo-500/20">

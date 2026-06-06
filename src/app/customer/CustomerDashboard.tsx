@@ -482,7 +482,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <div className="text-left space-y-1 border-r border-slate-50/10 dark:border-slate-800/80 pr-2">
             <span className="text-[9px] uppercase font-mono tracking-widest text-slate-500 font-bold block">Cash Available</span>
             <h2 className="text-xl font-extrabold font-mono tracking-tight text-indigo-500">
-              ${user.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {user.currency || 'KES'} {user.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h2>
             <span className="text-[8px] text-slate-400 block font-mono">Settled Account Base</span>
           </div>
@@ -490,7 +490,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
           <div className="text-left space-y-1 pl-2">
             <span className="text-[9px] uppercase font-mono tracking-widest text-slate-500 font-bold block">Holds / Pending</span>
             <h2 className="text-xl font-extrabold font-mono tracking-tight text-slate-450">
-              ${computedPendingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {user.currency || 'KES'} {computedPendingBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h2>
             <span className="text-[8px] text-slate-400 block font-mono">Scheduled Settlements</span>
           </div>
@@ -624,8 +624,8 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
         </div>
 
         <div className="text-lg font-extrabold tracking-tight font-mono mt-2">
-          ${user.savingCurrent.toLocaleString('en-US', { minimumFractionDigits: 0 })}
-          <span className="text-xs text-slate-400 font-normal ml-1">/ ${user.savingGoal.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
+          {user.currency || 'KES'} {user.savingCurrent.toLocaleString('en-US', { minimumFractionDigits: 0 })}
+          <span className="text-xs text-slate-400 font-normal ml-1">/ {user.currency || 'KES'} {user.savingGoal.toLocaleString('en-US', { minimumFractionDigits: 0 })}</span>
         </div>
 
         {/* Performance tracking bar */}
@@ -677,7 +677,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
                 <div className="flex justify-between items-center text-[10.5px]">
                   <span className="font-extrabold text-slate-700 dark:text-slate-300">{cat.name}</span>
                   <span className="font-mono font-bold text-indigo-400">
-                    ${cat.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {user.currency || 'KES'} {cat.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
                 
@@ -825,7 +825,7 @@ export const CustomerDashboard: React.FC<CustomerDashboardProps> = ({
 
                   <div className="text-right">
                     <span className={`text-[10.5px] font-extrabold font-mono block ${isDebit ? 'text-rose-500' : 'text-emerald-500'}`}>
-                      {isDebit ? '-' : '+'}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      {isDebit ? '-' : '+'}{user.currency || 'KES'} {tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                     <StatusBadge status={tx.status} darkMode={darkMode} />
                   </div>

@@ -114,7 +114,7 @@ export const TransferForm: React.FC<TransferFormProps> = ({
               <option value="">-- Choose recipient profile --</option>
               {transferRecipients.map(r => (
                 <option key={r.id} value={r.id}>
-                  {r.name} — Bal: ${r.balance.toLocaleString('en-US', { maxFractionDigits: 0 })}
+                  {r.name} — Bal: {r.currency || 'KES'} {r.balance.toLocaleString('en-US', { maxFractionDigits: 0 })}
                 </option>
               ))}
             </select>
@@ -123,17 +123,17 @@ export const TransferForm: React.FC<TransferFormProps> = ({
           {/* Amount input */}
           <div className="space-y-1">
             <label className="text-[10px] font-bold uppercase tracking-wider text-slate-400 font-sans block">
-              Remittance Amount (USD)
+              Remittance Amount ({user.currency || 'KES'})
             </label>
             <div className="relative">
-              <span className="absolute left-3.5 top-2.5 text-slate-400 font-mono font-bold">$</span>
+              <span className="absolute left-3 top-2.5 text-slate-400 font-sans font-bold text-[10px]">{user.currency || 'KES'}</span>
               <input
                 type="number"
                 step="0.01"
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className={`w-full text-xs font-mono pl-7 pr-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-1 ${
+                className={`w-full text-xs font-mono pl-12 pr-3.5 py-2.5 rounded-xl border focus:outline-none focus:ring-1 ${
                   darkMode 
                     ? 'bg-slate-950 border-slate-850 text-slate-100 focus:ring-indigo-900' 
                     : 'bg-white border-slate-200 text-slate-800 focus:ring-indigo-100'

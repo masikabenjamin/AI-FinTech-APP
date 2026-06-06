@@ -72,7 +72,7 @@ export function SpecsConsole() {
   ]);
 
   const [signoffSubmitted, setSignoffSubmitted] = useState<boolean>(false);
-  const [signoffApprover, setSignoffApprover] = useState<string>('CRO Alex Wong');
+  const [signoffApprover, setSignoffApprover] = useState<string>('CRO Ben Masika');
 
   const updateUatItemStatus = (id: string, status: 'PASS' | 'ACCEPT_RISK' | 'PENDING') => {
     setUatItems(prev => prev.map(item => {
@@ -166,7 +166,7 @@ export function SpecsConsole() {
     {
       title: 'Identity Care & KYC Guard (IAV)',
       acceptance: [
-        'Users without APPROVED KYC parameters are restricted to a total transfer limitation of $500.00 USD.',
+        'Users without APPROVED KYC parameters are restricted to a total transfer limitation of KES 50,000.00.',
         'MFA verification must prompt dynamically whenever administrative persona switches are requested.',
         'Compliance logs must record every document verification attempt directly to audit memory store.'
       ],

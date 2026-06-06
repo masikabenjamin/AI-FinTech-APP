@@ -43,7 +43,7 @@ export const OperationsCockpit: React.FC<OperationsCockpitProps> = ({
   // Filters State
   const [dateRange, setDateRange] = useState<'all' | 'today' | '7days' | '30days'>('all');
   const [productFilter, setProductFilter] = useState<'all' | 'DEPOSIT' | 'WITHDRAWAL' | 'TRANSFER'>('all');
-  const [currencyFilter, setCurrencyFilter] = useState<'all' | 'USD' | 'EUR' | 'GBP'>('all');
+  const [currencyFilter, setCurrencyFilter] = useState<'all' | 'KES' | 'EUR' | 'GBP'>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'COMPLETED' | 'PENDING' | 'FLAGGED' | 'FAILED'>('all');
 
   // Provider Status Overrides (Can toggle simulated provider degradations to test warning states)
@@ -248,7 +248,7 @@ export const OperationsCockpit: React.FC<OperationsCockpitProps> = ({
                 }`}
               >
                 <option value="all">All Currencies</option>
-                <option value="USD">USD - United States</option>
+                <option value="KES">KES - Kenyan Shillings</option>
                 <option value="EUR">EUR - Eurozone</option>
                 <option value="GBP">GBP - Sterling</option>
               </select>
@@ -556,7 +556,7 @@ export const OperationsCockpit: React.FC<OperationsCockpitProps> = ({
                   <div className="py-2 space-y-1.5 text-[10.5px]">
                     <div className="flex justify-between">
                       <span>Total volume pending:</span>
-                      <strong className="text-white font-mono">${financialStats.pendingSettlement.toFixed(1)} USD</strong>
+                      <strong className="text-white font-mono">KES {financialStats.pendingSettlement.toFixed(1)}</strong>
                     </div>
                     <div className="flex justify-between">
                       <span>Pending processing hold:</span>

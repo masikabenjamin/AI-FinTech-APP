@@ -284,7 +284,7 @@ export const UatDashboard: React.FC<UatDashboardProps> = ({
       { owner: 'Compliance Owner', title: 'Chief Risk & AML Officer', name: 'Liam Vance', status: 'PENDING', remarks: '' },
       { owner: 'Finance Owner', title: 'VP Solvency & Capital Reserves', name: 'Devin Finch', status: 'PENDING', remarks: '' },
       { owner: 'Support Owner', title: 'Head of Retail Dispute Desk', name: 'Gail Vance', status: 'PENDING', remarks: '' },
-      { owner: 'Technology Owner', title: 'Principal Software Architect', name: 'Alex Wong', status: 'PENDING', remarks: '' }
+      { owner: 'Technology Owner', title: 'Principal Software Architect', name: 'Ben Masika', status: 'PENDING', remarks: '' }
     ];
   });
 
@@ -505,7 +505,7 @@ export const UatDashboard: React.FC<UatDashboardProps> = ({
 
   // Seed credentials matrix lists to enable autofill & quick switches
   const seedUsersList = [
-    { name: 'Alex Wong', email: 'admin.super@apex.com', pass: 'SuperAdmin123!', role: 'Super Admin', type: 'ADMIN' },
+    { name: 'Ben Masika', email: 'admin.super@apex.com', pass: 'SuperAdmin123!', role: 'Super Admin', type: 'ADMIN' },
     { name: 'Liam Vance', email: 'compliance.analyst@apex.com', pass: 'Compliance123!', role: 'Compliance Analyst', type: 'ADMIN' },
     { name: 'Beatrice Cobb', email: 'ops.officer@apex.com', pass: 'Operations123!', role: 'Operations Officer', type: 'ADMIN' },
     { name: 'Devin Finch', email: 'finance.officer@apex.com', pass: 'Finance123!', role: 'Finance Officer', type: 'ADMIN' },

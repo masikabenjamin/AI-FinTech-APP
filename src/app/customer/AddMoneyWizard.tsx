@@ -40,7 +40,7 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
   
   // Enter Amount
   const [amountInput, setAmountInput] = useState('');
-  const [currency] = useState('USD');
+  const [currency] = useState('KES');
   const [amountError, setAmountError] = useState('');
   
   // Payment intent details from API
@@ -116,11 +116,11 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
 
     const parsedAmt = Number(amountInput);
     if (isNaN(parsedAmt) || parsedAmt < LIMIT_MIN) {
-      setAmountError(`Minimum deposit limit is $${LIMIT_MIN.toFixed(2)} USD.`);
+      setAmountError(`Minimum deposit limit is KES ${LIMIT_MIN.toFixed(2)}.`);
       return;
     }
     if (parsedAmt > LIMIT_MAX) {
-      setAmountError(`Maximum single deposit limit is $${LIMIT_MAX.toFixed(2)} USD.`);
+      setAmountError(`Maximum single deposit limit is KES ${LIMIT_MAX.toFixed(2)}.`);
       return;
     }
 
@@ -209,7 +209,7 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
             onAddDynamicNotification({
               id: `dyn-nt-${Date.now()}`,
               title: 'Funding transaction approved',
-              desc: `Deposited $${res.transaction.amount.toFixed(2)} USD via ${fundingSource}. Balance cleared!`,
+              desc: `Deposited KES ${res.transaction.amount.toFixed(2)} via ${fundingSource}. Balance cleared!`,
               time: 'Just now',
               type: 'success'
             });
@@ -217,7 +217,7 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
             onAddDynamicNotification({
               id: `dyn-nt-${Date.now()}`,
               title: 'Funding status pending settlement',
-              desc: `Deposit transaction of $${res.transaction.amount.toFixed(2)} placed in settlement queue.`,
+              desc: `Deposit transaction of KES ${res.transaction.amount.toFixed(2)} placed in settlement queue.`,
               time: 'Just now',
               type: 'warn'
              });
@@ -261,7 +261,7 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
   };
 
   const formatCurrency = (val: number) => {
-    return val.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    return val.toLocaleString('en-US', { style: 'currency', currency: 'KES' });
   };
 
   return (
@@ -382,9 +382,9 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
               </div>
 
               <div className="text-left space-y-1">
-                <label className="text-[9px] font-mono font-extrabold text-slate-450 block uppercase tracking-wider">DEPOSIT AMOUNT (USD)</label>
+                <label className="text-[9px] font-mono font-extrabold text-slate-450 block uppercase tracking-wider">DEPOSIT AMOUNT (KES)</label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-3 text-xs font-bold">$</span>
+                  <span className="absolute left-3 top-3 text-[10px] font-bold">KES</span>
                   <input
                     type="number"
                     placeholder="0.00"
@@ -394,11 +394,11 @@ export const AddMoneyWizard: React.FC<AddMoneyWizardProps> = ({
                       setAmountInput(e.target.value);
                       setAmountError('');
                     }}
-                    className={`w-full font-mono font-extrabold pl-7 pr-12 py-3 rounded-2xl text-xs border focus:ring-1 focus:outline-none ${
-                      darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-50 border-slate-200'
+                    className={`w-full font-mono font-extrabold pl-12 pr-12 py-3 rounded-2xl text-xs border focus:ring-1 focus:outline-none ${
+                      darkMode ? 'bg-slate-950 border-slate-800 text-white' : 'bg-slate-55 border-slate-200'
                     }`}
                   />
-                  <span className="absolute right-3.5 top-3.5 text-[9px] font-mono font-bold text-slate-450">USD</span>
+                  <span className="absolute right-3.5 top-3.5 text-[9px] font-mono font-bold text-slate-450">KES</span>
                 </div>
                 {amountError ? (
                   <p className="text-[9.5px] font-bold text-rose-500 font-mono mt-1 leading-normal">⚠️ {amountError}</p>

@@ -523,7 +523,7 @@ export const CardsView: React.FC<CardsViewProps> = ({ user, darkMode = false, on
                     </div>
                     <div className="text-right">
                       <div className={`text-[11px] font-mono font-extrabold ${tx.status === 'FAILED' ? 'text-slate-400 line-through' : 'text-rose-500'}`}>
-                        -${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        -{user.currency || 'KES'} {tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                       </div>
                       <div className="text-[7.5px] font-mono text-slate-400">
                         {tx.status}
