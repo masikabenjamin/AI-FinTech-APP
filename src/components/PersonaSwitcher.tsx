@@ -99,16 +99,16 @@ export const PersonaSwitcher: React.FC<PersonaSwitcherProps> = ({
           {/* Admin Switcher */}
           <button
             onClick={() => {
-              const rootCRO = users.find(u => u.role === 'customer') || {
-                id: 'sys-admin',
-                name: 'CRO Alex Wong (Admin)',
-                email: 'cro.audit@platform.com',
-                role: 'admin',
+              const adminUser = users.find(u => u.id === 'usr-super-admin' || u.role === 'Super Admin') || {
+                id: 'usr-super-admin',
+                name: 'Alex Wong (Super Admin)',
+                email: 'admin.super@apex.com',
+                role: 'Super Admin',
                 balance: 0,
                 kycStatus: 'APPROVED',
                 riskTier: 'LOW',
               } as any;
-              onSelectUser({ ...rootCRO, role: 'admin', name: 'CRO Alex Wong', email: 'cro.audit@platform.com' });
+              onSelectUser(adminUser);
             }}
             className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all border ${
               activeUser?.role === 'admin'
