@@ -237,7 +237,7 @@ export class AICore {
         proposedBy: 'Sarah Jenkins (Risk Manager)',
         proposedAt: '2026-06-03T10:00:00Z',
         status: 'APPROVED',
-        approvedBy: 'Alex Corporate (Super Admin)',
+        approvedBy: 'Ben Masika (Super Admin)',
         approvedAt: '2026-06-03T11:30:00Z',
         notes: 'Tightening fraud rules to flag high-frequency small deposit loops.',
         auditorFeedback: 'Approved: verified ledger logs confirm slight increase in debit loop risk.'

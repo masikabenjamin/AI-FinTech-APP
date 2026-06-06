@@ -6,6 +6,52 @@ const API_BASE = '/api';
 const originalFetch = window.fetch.bind(window);
 let isLocalFallbackActive = localStorage.getItem('apex_local_fallback_active') === 'true';
 
+// --- SELF-HEALING CACHE CLEANUP & MIGRATION FOR SANDBOX PERSONA & CURRENCY ---
+try {
+  const cachedSess = localStorage.getItem('apex_session_user');
+  if (cachedSess) {
+    const parsed = JSON.parse(cachedSess);
+    let updated = false;
+    if (parsed.id === 'usr-super-admin' && (!parsed.name || parsed.name.includes('Alex Wong'))) {
+      parsed.name = 'Ben Masika (Super Admin)';
+      parsed.currency = 'KES';
+      updated = true;
+    }
+    if (parsed.currency === 'USD') {
+      parsed.currency = 'KES';
+      updated = true;
+    }
+    if (updated) {
+      localStorage.setItem('apex_session_user', JSON.stringify(parsed));
+    }
+  }
+
+  const cachedDb = localStorage.getItem('apex_sand_local_db_v2');
+  if (cachedDb) {
+    const parsed = JSON.parse(cachedDb);
+    let updated = false;
+    if (parsed && parsed.users) {
+      parsed.users = parsed.users.map((u: any) => {
+        if (u.id === 'usr-super-admin' && (!u.name || u.name.includes('Alex Wong'))) {
+          u.name = 'Ben Masika (Super Admin)';
+          u.currency = 'KES';
+          updated = true;
+        }
+        if (u.currency === 'USD') {
+          u.currency = 'KES';
+          updated = true;
+        }
+        return u;
+      });
+    }
+    if (updated) {
+      localStorage.setItem('apex_sand_local_db_v2', JSON.stringify(parsed));
+    }
+  }
+} catch (e) {
+  console.warn('Sandbox cache migrate failed', e);
+}
+
 const DEFAULT_PASSWORDS: Record<string, string> = {
   'sarah.j@enterprise.com': 'Sarah123!',
   'chen.m@techcorp.io': 'Michael123!',
